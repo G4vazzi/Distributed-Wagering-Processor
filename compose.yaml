@@ -1,0 +1,48 @@
+
+name: distributed-wagering-processor
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: wagering-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: wagering
+      POSTGRES_USER: wagering
+      POSTGRES_PASSWORD: wagering_dev
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wagering -d wagering"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  ministack:
+    image: ministackorg/ministack:latest
+    container_name: wagering-ministack
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:4566:4566"
+    environment:
+      GATEWAY_PORT: 4566
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      AWS_DEFAULT_REGION: us-east-1
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
