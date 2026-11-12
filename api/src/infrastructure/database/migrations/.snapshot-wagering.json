@@ -522,7 +522,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "unique": false,
+          "unique": true,
           "length": null,
           "precision": null,
           "scale": null,
@@ -608,6 +608,18 @@
           "keyName": "wager_idempotency_key_unique",
           "unique": true,
           "primary": false
+        },
+        {
+          "columnNames": [
+            "reference_transaction_id",
+            "kind"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "wager_processed_reversal_unique",
+          "unique": true,
+          "primary": false,
+          "expression": "CREATE UNIQUE INDEX wager_processed_reversal_unique ON public.wager_transactions USING btree (reference_transaction_id, kind) WHERE ((reference_transaction_id IS NOT NULL) AND ((kind)::text = ANY ((ARRAY['REFUND'::character varying, 'ROLLBACK'::character varying])::text[])) AND ((status)::text = 'PROCESSED'::text))"
         },
         {
           "columnNames": [
