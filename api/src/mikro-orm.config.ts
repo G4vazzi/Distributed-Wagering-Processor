@@ -11,8 +11,14 @@ import { WagerTransactionRecord } from
 import { WalletLedgerEntryRecord } from
   './infrastructure/database/entities/wallet-ledger-entry-record.entity';
 
-  import { WalletRecord } from
+import { WalletRecord } from
   './infrastructure/database/entities/wallet-record.entity';
+
+import { InboxMessageRecord } from
+  './infrastructure/database/entities/inbox-message-record.entity';
+
+import { OutboxMessageRecord } from
+  './infrastructure/database/entities/outbox-message-record.entity';
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -26,7 +32,9 @@ export default defineConfig({
   entities: [
     WalletRecord,
     WagerTransactionRecord,
-    WalletLedgerEntryRecord
+    WalletLedgerEntryRecord,
+    InboxMessageRecord,
+    OutboxMessageRecord,
   ],
 
   metadataProvider: ReflectMetadataProvider,
