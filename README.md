@@ -400,6 +400,33 @@ Expected invariants:
 - Final wallet balance of 20.00
 - No duplicate financial effects
 
+
+### Verified Distributed Concurrency Results
+
+The distributed concurrency test was successfully executed
+with three independent SQS consumer processes and one
+Outbox publisher.
+
+Test scenario:
+- Initial wallet balance: BRL 100.00
+- 24 SQS messages representing two distinct BET operations
+- Each BET amount: BRL 80.00
+
+Verified results:
+- 1 BET processed
+- 1 BET rejected
+- 1 ledger debit
+- 2 logical Inbox records
+- 3 Outbox events published
+- Final wallet balance: BRL 20.00
+
+Result: DISTRIBUTED CONCURRENCY TEST PASSED
+
+The test demonstrates financial consistency under this
+concurrent workload. It does not replace comprehensive
+failure-injection or production load testing.
+
+
 ## Known Limitations
 
 This implementation is a technical challenge
