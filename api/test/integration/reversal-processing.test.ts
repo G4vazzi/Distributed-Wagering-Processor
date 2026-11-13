@@ -316,8 +316,6 @@ describe('REFUND e ROLLBACK - PostgreSQL', () => {
 
     const refundResult = await process(refund);
 
-    console.log('REFUND:', refundResult);
-
     expect(refundResult.status).toBe(Status.Processed);
     expect(refundResult.balance.amount).toBe('100.00');
 
@@ -330,10 +328,6 @@ describe('REFUND e ROLLBACK - PostgreSQL', () => {
     );
 
     const rollback = await process(rollbackInput);
-
-    // Diagnóstico temporário para identificar rejeições.
-    console.log('ROLLBACK:', rollback);
-    console.log('FailureCode:', rollback.failureCode);
 
     expect(rollback.status).toBe(Status.Processed);
     expect(rollback.balance.amount).toBe('60.00');
