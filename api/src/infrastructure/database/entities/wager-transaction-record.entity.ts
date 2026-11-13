@@ -4,6 +4,7 @@ import {
   Entity,
   Index,
   ManyToOne,
+  Opt,
   PrimaryKey,
   Property,
   Unique,
@@ -144,4 +145,29 @@ export class WagerTransactionRecord {
     nullable: true,
   })
   processedAt?: Date;
+
+  // ==========================================
+  // PENDING REFERENCE RETRY CONTROL
+  // ==========================================
+
+  @Property({
+    fieldName: 'retry_attempts',
+    default: 0,
+  })
+  retryAttempts: number & Opt = 0;
+
+  @Property({
+    fieldName: 'next_retry_at',
+    columnType: 'timestamptz',
+    nullable: true,
+  })
+  nextRetryAt?: Date;
+
+  @Property({
+    fieldName: 'last_retry_at',
+    columnType: 'timestamptz',
+    nullable: true,
+  })
+  lastRetryAt?: Date;
+
 }

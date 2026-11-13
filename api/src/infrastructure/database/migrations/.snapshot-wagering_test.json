@@ -594,6 +594,54 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "datetime"
+        },
+        "retry_attempts": {
+          "name": "retry_attempts",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": "0",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "next_retry_at": {
+          "name": "next_retry_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "last_retry_at": {
+          "name": "last_retry_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
         }
       },
       "name": "wager_transactions",
@@ -608,6 +656,19 @@
           "keyName": "wager_idempotency_key_unique",
           "unique": true,
           "primary": false
+        },
+        {
+          "columnNames": [
+            "next_retry_at",
+            "created_at",
+            "id"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "wager_pending_retry_due_idx",
+          "unique": false,
+          "primary": false,
+          "expression": "CREATE INDEX wager_pending_retry_due_idx ON public.wager_transactions USING btree (next_retry_at, created_at, id) WHERE ((status)::text = 'PENDING_REFERENCE'::text)"
         },
         {
           "columnNames": [
@@ -672,6 +733,12 @@
           "columnName": "result_balance",
           "definition": "CHECK (((result_balance IS NULL) OR (result_balance >= (0)::numeric)))",
           "expression": "result_balance IS NULL) OR (result_balance >= (0)"
+        },
+        {
+          "name": "wager_retry_attempts_nonnegative_check",
+          "columnName": "retry_attempts",
+          "definition": "CHECK ((retry_attempts >= 0))",
+          "expression": "retry_attempts >= 0"
         }
       ],
       "foreignKeys": {
@@ -901,7 +968,7 @@
         },
         {
           "name": "ledger_arithmetic_check",
-          "columnName": "amount",
+          "columnName": "direction",
           "definition": "CHECK (((((direction)::text = 'CREDIT'::text) AND (balance_after = (balance_before + amount))) OR (((direction)::text = 'DEBIT'::text) AND (balance_after = (balance_before - amount)))))",
           "expression": "((direction = 'CREDIT'::text) AND balance_after = (balance_before + amount))) OR (((direction = 'DEBIT'::text) AND (balance_after = (balance_before - amount)))"
         },

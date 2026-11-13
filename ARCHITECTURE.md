@@ -136,7 +136,35 @@ Health endpoints would remain unauthenticated.
 
 Financial endpoints must not be exposed publicly without this integration and additional request protection.
 
-## 11. Known Limitations and Next Steps
+
+## 11. Pending Reference Recovery
+
+REFUND and ROLLBACK operations may arrive before their
+referenced transactions.
+
+When a reference is unavailable, the transaction is
+persisted with the PENDING_REFERENCE status.
+
+A dedicated background worker periodically checks
+pending transactions and attempts to resolve them.
+
+The recovery strategy includes:
+
+- Persistent retry attempts in PostgreSQL.
+- Exponential backoff between attempts.
+- A maximum of 6 retry attempts.
+- A 30-minute expiration window.
+- Transactional row locking to prevent concurrent processing.
+- Reuse of the existing financial reversal use case.
+- Automatic rejection after retry exhaustion or expiration.
+- Rejection events persisted in the Transactional Outbox.
+
+The implementation was validated with unit and PostgreSQL
+integration tests, including delayed references,
+concurrent recovery attempts and expiration behavior.
+
+
+## 12. Known Limitations and Next Steps
 
 The following items remain incomplete or require additional verification:
 

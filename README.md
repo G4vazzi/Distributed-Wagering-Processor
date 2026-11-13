@@ -306,6 +306,38 @@ Failures are retried with exponential backoff.
 Because delivery is at-least-once, downstream event
 consumers must also handle duplicate events.
 
+### Pending Reference Recovery
+
+The system includes a dedicated background worker for
+REFUND and ROLLBACK transactions in PENDING_REFERENCE.
+
+The worker periodically checks pending transactions
+and attempts to resolve their original references.
+
+Features:
+- Exponential backoff between retries
+- Persistent retry metadata in PostgreSQL
+- Maximum of 6 retry attempts
+- 30-minute expiration window
+- Transactional processing with database locking
+- Automatic rejection when retry limits are exceeded
+- Rejection events recorded in the Transactional Outbox
+
+Run the worker:
+
+```powershell
+bun run src/workers/pending-reference.worker.ts
+```
+
+Run a single processing cycle:
+
+```powershell
+bun run src/workers/pending-reference.worker.ts --once
+```
+
+The recovery behavior is covered by unit and PostgreSQL
+integration tests.
+
 ## Testing
 
 ### Isolated Test Database
@@ -337,7 +369,7 @@ bun test ./test/unit ./test/integration
 ```
 
 The financial test suite has been verified with
-**81 passing tests**.
+**89 passing tests**.
 
 ### Type Checking and Build
 
